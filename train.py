@@ -44,10 +44,9 @@ def get_dataset_transform():
 
 class ModelAD(object):
 
-    def __init__(self, device, model_name, dataset_csv_filename):
+    def __init__(self, device, model_name):
         self.device = device
         self.model_name = model_name
-        self.dataset_csv_filename = dataset_csv_filename
         self.dataset_dir = os.path.join(root_path, 'datasets')
         self.checkpoint_save_dir = os.path.join(root_path, 'checkpoints', model_name)
         if not os.path.exists(self.checkpoint_save_dir):
@@ -219,7 +218,7 @@ class ModelAD(object):
 
 
 if __name__ == '__main__':
-    model = ModelAD(device=torch.device('cuda:1'), model_name='xjy_20231218', dataset_csv_filename='multi_MRI_PET.csv')
+    model = ModelAD(device=torch.device('cuda:1'), model_name='xjy_20231218')
     model.build_model()
     model.load_data(batch_size=4)
     model.train()
