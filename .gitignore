@@ -8,3 +8,4 @@ datasets/xjy_20231218
 datasets/train.csv
 datasets/valid.csv
 datasets/test.csv
+graph/static/images
