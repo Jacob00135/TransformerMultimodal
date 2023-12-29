@@ -56,11 +56,15 @@ body > .shade {
 }
 
 .nav ul > li > a:hover,
-.nav ul > li[data-active="1"] > a {
+.nav ul > li[data-active="1"] > a,
+.nav #repaint:hover {
     background-color: #cbcbcb;
 }
 
-.nav ul > li > a:visited {
+.nav ul > li > a:active,
+.nav ul > li > a:visited,
+.nav #repaint:active,
+.nav #repaint:visited {
     color: blue;
 }
 
@@ -75,14 +79,6 @@ body > .shade {
     text-decoration: none;
     line-height: 40px;
     cursor: pointer;
-}
-
-.nav #repaint:hover {
-    background-color: #cbcbcb;
-}
-
-.nav #repaint:visited {
-    color: blue;
 }
 
 body .image-box:last-of-type {
