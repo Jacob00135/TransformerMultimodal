@@ -63,16 +63,21 @@ def main():
         'sensitivity': [],
         'specificity': [],
         'f1_score': [],
-        'auc': []
+        'auc': [],
+        'benefit': []
     }
     start_time = get_timestamp()
 
     # 模型初始化
-    model = ModelAD(device=device, model_name=model_name, dataset_csv_filename='multi_MRI_PET.csv')
+    model = ModelAD(device=device, model_name=model_name)
     model.build_model()
-    model.load_data(batch_size=4)
+    model.load_data(batch_size=4, shuffle=False)
+    benefit = pd.read_csv(os.path.join(root_path, 'datasets/test.csv'))['benefit'].fillna(0).values
+    benefit = benefit / benefit.sum()
 
-    for fn in os.listdir(checkpoint_save_dir):
+    checkpoint_filenames = os.listdir(checkpoint_save_dir)
+    all_prediction = np.zeros((len(checkpoint_filenames), benefit.shape[0], 2), dtype='float32')
+    for i, fn in enumerate(checkpoint_filenames):
         # 获取模型名称
         only_name, extend_name = fn.rsplit('.', 1)
         if extend_name != 'pth':
@@ -86,6 +91,7 @@ def main():
 
         # 预测并计算指标
         one_hot_prediction, labels, batch_loss_list = model.predict('test')
+        all_prediction[i] = one_hot_prediction
         prediction = one_hot_prediction.argmax(axis=1)
         one_hot_labels = one_hot(labels)
         cm = ConfusionMatrix(labels, prediction)
@@ -101,6 +107,7 @@ def main():
         result['sensitivity'].append(cm.get_sensitivity())
         result['specificity'].append(cm.get_specificity())
         result['auc'].append(roc_auc_score(one_hot_labels, one_hot_prediction))
+        result['benefit'].append(benefit[prediction == labels].sum())
 
         print('完成：model_name = {} -- {:.2f}s'.format(fn, get_timestamp() - start_time))
         start_time = get_timestamp()
@@ -110,6 +117,7 @@ def main():
     save_dir = os.path.join(root_path, 'datasets', model_name)
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
+    np.save(os.path.join(save_dir, 'prediction.npy'), all_prediction)
     result.to_csv(os.path.join(save_dir, 'performance.csv'), index=False)
 
 

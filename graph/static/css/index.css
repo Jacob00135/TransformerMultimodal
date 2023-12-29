@@ -10,7 +10,7 @@ html {
 
 body {
     margin: 0;
-    padding: 20px 0;
+    padding: 70px 0;
     background-color: #efefef;
 }
 
@@ -21,6 +21,68 @@ body > .shade {
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+.nav {
+    position: fixed;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #e4e4e4;
+    box-shadow: 0 0 7px 2px rgba(0, 0, 0, .1);
+}
+
+.nav ul {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.nav ul > li {
+    list-style: none;
+    line-height: 50px;
+}
+
+.nav ul > li > a {
+    display: block;
+    padding: 0 20px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav ul > li > a:hover,
+.nav ul > li[data-active="1"] > a {
+    background-color: #cbcbcb;
+}
+
+.nav ul > li > a:visited {
+    color: blue;
+}
+
+.nav #repaint {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    height: 40px;
+    margin-top: 5px;
+    padding: 0 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    line-height: 40px;
+    cursor: pointer;
+}
+
+.nav #repaint:hover {
+    background-color: #cbcbcb;
+}
+
+.nav #repaint:visited {
+    color: blue;
 }
 
 body .image-box:last-of-type {
@@ -34,7 +96,7 @@ body .image-box:last-of-type {
 
 .image-box img {
     max-width: calc(100% - 40px);
-    max-height: calc(100vh - 80px);
+    max-height: calc(100vh - 130px);
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, .5);
 }
 

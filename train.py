@@ -57,6 +57,9 @@ class ModelAD(object):
         self.train_dataloader = None
         self.valid_dataloader = None
         self.test_dataloader = None
+        self.num_train = 0
+        self.num_valid = 0
+        self.num_test = 0
         self.net = None
         self.optimizer = None
         self.loss = None
@@ -75,20 +78,23 @@ class ModelAD(object):
 
         return dataset_dict
 
-    def dataset_dict_to_dataloader(self, dataset_dict, dataset_transform):
+    def dataset_dict_to_dataloader(self, dataset_dict, dataset_transform, shuffle=True):
         dataset = Dataset(data=dataset_dict, transform=dataset_transform)
-        dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, num_workers=0)
+        dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers=0)
         return dataloader
 
-    def load_data(self, batch_size=4):
+    def load_data(self, batch_size=4, shuffle=True):
         self.batch_size = batch_size
         train_transform, test_transform = get_dataset_transform()
         train_df = pd.read_csv(os.path.join(self.dataset_dir, 'train.csv'))
         valid_df = pd.read_csv(os.path.join(self.dataset_dir, 'valid.csv'))
         test_df = pd.read_csv(os.path.join(self.dataset_dir, 'test.csv'))
-        self.train_dataloader = self.dataset_dict_to_dataloader(self.dataset_dataframe_to_dict(train_df), train_transform)
-        self.valid_dataloader = self.dataset_dict_to_dataloader(self.dataset_dataframe_to_dict(valid_df), test_transform)
-        self.test_dataloader = self.dataset_dict_to_dataloader(self.dataset_dataframe_to_dict(test_df), test_transform)
+        self.num_train = train_df.shape[0]
+        self.num_valid = valid_df.shape[0]
+        self.num_test = test_df.shape[0]
+        self.train_dataloader = self.dataset_dict_to_dataloader(self.dataset_dataframe_to_dict(train_df), train_transform, shuffle=shuffle)
+        self.valid_dataloader = self.dataset_dict_to_dataloader(self.dataset_dataframe_to_dict(valid_df), test_transform, shuffle=shuffle)
+        self.test_dataloader = self.dataset_dict_to_dataloader(self.dataset_dataframe_to_dict(test_df), test_transform, shuffle=shuffle)
 
     def build_model(self, init_lr=0.0001):
         dim = 128
@@ -157,16 +163,19 @@ class ModelAD(object):
     def predict(self, stage):
         if stage == 'train':
             dataset = self.train_dataloader
+            num_dataset = self.num_train
         elif stage == 'valid':
             dataset = self.valid_dataloader
+            num_dataset = self.num_valid
         elif stage == 'test':
             dataset = self.test_dataloader
+            num_dataset = self.num_test
         else:
             raise 'stage只能取：`train`，`valid`，`test`'
 
         self.net.eval()
-        prediction = np.zeros((dataset.sampler.num_samples, self.num_classes), dtype='float32')
-        labels = np.zeros(dataset.sampler.num_samples, dtype='int')
+        prediction = np.zeros((num_dataset, self.num_classes), dtype='float32')
+        labels = np.zeros(num_dataset, dtype='int')
         batch_loss_list = []
         with torch.no_grad():
             for batch_index, batch_data in enumerate(dataset):

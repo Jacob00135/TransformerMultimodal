@@ -10,8 +10,29 @@
     <link rel="stylesheet" href="/static/css/index.css"/>
 </head>
 <body>
+    <!-- 导航栏 -->
+    <div class="nav">
+        <ul data-active="{{ category }}">
+            <li data-category="full">
+                <a href="{{ url_for('index', category='full') }}">全图</a>
+            </li>
+            <li data-category="magnify">
+                <a href="{{ url_for('index', category='magnify') }}">放大图</a>
+            </li>
+            <li data-category="subplot">
+                <a href="{{ url_for('index', category='subplot') }}">子图</a>
+            </li>
+        </ul>
+        <a id="repaint" href="{{ url_for('index', category=category, repaint=1) }}">重绘</a>
+    </div>
+
+    <!-- 遮罩层，用于调整亮度 -->
     <div class="shade"></div>
+
+    <!-- 调整亮度的控件 -->
     <input id="adjust-light" type="range" min="0" max="100" value="20" />
+
+    <!-- 图片列表 -->
     {% for fn in image_filenames %}
         <div class="image-box">
             <img src="/static/images/{{ fn }}" title="{{ image_fullpaths[loop.index0] }}" />
@@ -21,3 +42,4 @@
 
     <script src="/static/js/index.js"></script>
 </body>
+</html>
