@@ -1,12 +1,9 @@
 import os
-import sys
 import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from collections import OrderedDict
-
-sys.path.append(os.path.realpath('..'))
 from config import root_path
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -19,8 +16,8 @@ class DrawScatter(object):
         self.x = x
         self.y = y
 
-    def draw_full(self, figsize, dpi, xlabel, save_path, adjust_padding=None):
-        plt.figure(figsize=figsize, dpi=dpi)
+    def draw_full(self, figsize, dpi, xlabel, save_path, set_size_inches=None, adjust_padding=None):
+        fig = plt.figure(figsize=figsize, dpi=dpi)
         ax = plt.subplot(1, 1, 1)
         plt.scatter(
             self.x,
@@ -38,11 +35,14 @@ class DrawScatter(object):
         plt.yticks(np.arange(0.0, 1.1, 0.1))
         plt.xlabel(xlabel)
         plt.ylabel('benefit')
-        plt.savefig(save_path)
-        plt.grid(True, c='#eeeeee', ls='--', zorder=0)
+        plt.grid(True, c='#eeeeee', ls='--', lw=0.5, zorder=0)
         ax.set_aspect('equal', adjustable='box')
+        if set_size_inches is not None:
+            fig.set_size_inches(*set_size_inches)
         if adjust_padding is not None:
             plt.subplots_adjust(**adjust_padding)
+        plt.savefig(save_path)
+        plt.close()
 
     def draw_magnify(self):
         pass
@@ -78,13 +78,37 @@ def draw_full_scatter(performance):
             figsize=(4, 4),
             dpi=1200,
             xlabel=draw_config['xlabel'],
-            adjust_padding={'left': 0, 'bottom': 0, 'right': 0.99, 'top': 0.99},
+            set_size_inches=(3.5, 3.5),
+            adjust_padding={'left': 0.15, 'bottom': 0.13, 'top': 0.93, 'right': 0.95},
             save_path=os.path.join(root_path, 'graph/full_{}.png'.format(variable_name))
         )
 
 
 def draw_magnify_scatter(performance):
-    pass
+    config_map = {
+        'accuracy': {
+            'xlabel': '$Accuracy$'
+        },
+        'sensitivity': {
+            'xlabel': '$Sensitivity$'
+        },
+        'specificity': {
+            'xlabel': '$Specificity$'
+        },
+        'f1_score': {
+            'xlabel': '$F1~Score$'
+        },
+        'auc': {
+            'xlabel': '$AUC$'
+        }
+    }
+    for variable_name, draw_config in config_map.items():
+        df = performance[[variable_name, 'benefit']].sort_values(by=variable_name)
+        x = df[variable_name].values
+        y = df['benefit'].values
+        ds = DrawScatter(x, y)
+        ds.draw_magnify(
+        )
 
 
 def draw_subplot_scatter(performance):
