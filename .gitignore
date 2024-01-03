@@ -3,9 +3,8 @@ __pycache__
 TransMF_AD-master.zip
 compute_performance.log
 train.log
-packaging_project.py
 datasets/xjy_20231218
 datasets/train.csv
 datasets/valid.csv
 datasets/test.csv
-graph/static/images
+graph/

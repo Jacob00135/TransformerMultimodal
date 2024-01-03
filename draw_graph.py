@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -78,7 +79,7 @@ def draw_full_scatter(performance):
             dpi=1200,
             xlabel=draw_config['xlabel'],
             adjust_padding={'left': 0, 'bottom': 0, 'right': 0.99, 'top': 0.99},
-            save_path=os.path.join(root_path, 'graph/static/images/full_{}.png'.format(variable_name))
+            save_path=os.path.join(root_path, 'graph/full_{}.png'.format(variable_name))
         )
 
 
@@ -97,5 +98,26 @@ def get_performance(model_name):
     return performance
 
 
+def main():
+    graph_save_dir = os.path.join(root_path, 'graph')
+    if not os.path.exists(graph_save_dir):
+        os.mkdir(graph_save_dir)
+    category_function_mapping = {
+        'full': draw_full_scatter,
+        'magnify': draw_magnify_scatter,
+        'subplot': draw_subplot_scatter
+    }
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--category', help='绘图类型, 可选：full, magnify, subplot。默认：full')
+    args = parser.parse_args()
+    category = args.category
+    if category not in category_function_mapping:
+        category = 'full'
+    function = category_function_mapping[category]
+    performance = get_performance('xjy_20231218')
+    function(performance)
+    print('run: {}'.format(category))
+
+
 if __name__ == '__main__':
-    pass
+    main()
